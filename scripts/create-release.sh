@@ -231,9 +231,9 @@ python3 icap_test.py --host <icap-server> --port 1344 --service avscan
 
 ## 🔗 Links
 
-- [README](../README.md)
-- [Docker-Dokumentation](../DOCKER.md)
-- [CHANGELOG](../CHANGELOG.md)
+- [README](https://github.com/roimme65/icap-test-script/blob/main/README.md)
+- [Docker-Dokumentation](https://github.com/roimme65/icap-test-script/blob/main/DOCKER.md)
+- [CHANGELOG](https://github.com/roimme65/icap-test-script/blob/main/CHANGELOG.md)
 - [GitHub Release](https://github.com/roimme65/icap-test-script/releases/tag/v${NEW_VERSION})
 
 ---
