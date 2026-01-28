@@ -29,7 +29,7 @@ services:
     networks:
       - icap-network
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "1344"]
+      test: ["CMD", "python3", "-c", "import socket; s=socket.socket(); s.settimeout(2); s.connect(('localhost',1344)); s.close()"]
       interval: 10s
       timeout: 5s
       retries: 3
