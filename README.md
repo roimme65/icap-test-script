@@ -374,7 +374,9 @@ clamav:
 
 ## 📄 Lizenz
 
-MIT License - Frei verwendbar für Tests und Entwicklung
+MIT License - Frei verwendbar für Tests und Entwicklung.
+
+Siehe [LICENSE](LICENSE) Datei für Details.
 
 ## ✨ Credits
 
