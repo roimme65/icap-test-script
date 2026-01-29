@@ -1,7 +1,9 @@
+name: icap-security-suite
+
 services:
   clamav:
     image: clamav/clamav:latest
-    container_name: clamav
+    container_name: icap-security-clamav
     ports:
       - "3310:3310"
     volumes:
@@ -20,7 +22,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/icap-server/Dockerfile
-    container_name: icap-server
+    container_name: icap-security-server
+    image: icap-security-suite/server:1.0.3
     ports:
       - "1344:1344"
     depends_on:

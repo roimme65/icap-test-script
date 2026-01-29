@@ -1,6 +1,39 @@
-# ICAP Test Script
+# ICAP Security Testing Suite
 
-Ein vollständiges ICAP-Testing-System mit Python-ICAP-Server, ClamAV-Integration und automatisierten Tests für Virenscanning.
+> 🛡️ **Professional ICAP Testing & Development Platform** - Vollständige, produktionsreife ICAP-Lösung mit Python-Server, ClamAV-Integration und automatisierten Security-Tests.
+
+[![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)](VERSION)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](docker-compose.yml)
+
+## 📖 Projekt-Übersicht
+
+Dieses Projekt stellt eine **vollständige Test- und Entwicklungsumgebung** für das ICAP-Protokoll (Internet Content Adaptation Protocol - RFC 3507) bereit. Es kombiniert einen minimalistischen, aber vollständig funktionsfähigen ICAP-Server mit einer integrierten Antivirus-Engine und einem umfassenden Test-Framework.
+
+### 🎯 Hauptziele
+
+- **🚀 Schneller Einstieg:** In 3 Minuten einsatzbereit mit Docker
+- **📚 Lernressource:** Verstehen und implementieren des ICAP-Protokolls
+- **🧪 Testing-Framework:** Automatisierte Tests für ICAP-Implementierungen
+- **🔧 Entwicklungstool:** Basis für eigene ICAP-Server-Entwicklungen
+- **✅ Qualitätssicherung:** Validierung von Antivirus-Integrationen
+
+### 🌟 Warum dieses Projekt?
+
+**Einfachheit trifft Funktionalität:**
+- ✨ Pure Python - Keine komplizierten C-Dependencies oder Build-Prozesse
+- 📦 Plug & Play - Docker-Setup in Sekunden statt Stunden
+- 🎓 Gut dokumentiert - Jede Zeile Code erklärt und verständlich
+- 🔬 Testbar - EICAR-Tests und umfassende Validierung inklusive
+- 🚀 Produktionsreif - Echte ClamAV-Integration, Multi-Threading, robustes Error-Handling
+
+**Perfekt für:**
+- 👨‍💻 Entwickler, die ICAP-Clients testen möchten
+- 🏢 Unternehmen, die Content-Filtering validieren müssen
+- 🎓 Lernende, die ICAP verstehen wollen
+- 🧑‍🔬 QA-Engineers für automatisierte Tests
+- 🔐 Security-Teams für Antivirus-Validierung
 
 ## 🎯 Features
 
