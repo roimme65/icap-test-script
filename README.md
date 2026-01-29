@@ -2,7 +2,7 @@
 
 > 🛡️ **Professional ICAP Testing & Development Platform** - Vollständige, produktionsreife ICAP-Lösung mit Python-Server, ClamAV-Integration und automatisierten Security-Tests.
 
-[![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)](VERSION)
+[![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)](VERSION)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](docker-compose.yml)
