@@ -6,18 +6,17 @@ Automatisierte Git-Commands für intelligentes Pushing und Pulling mit Diff-Anze
 
 ### Linux/macOS
 
-1. **Kopiere die Prompt-Dateien zur globalen VS Code Copilot-Konfiguration:**
+1. **Kopiere alle Prompt-Dateien zur globalen VS Code Copilot-Konfiguration:**
 
 ```bash
 # Erstelle das Verzeichnis, falls es nicht existiert
 mkdir -p ~/.config/Code/User/globalStorage/github.copilot/prompts
 
-# Kopiere die Prompts
-cp push-repository.md ~/.config/Code/User/globalStorage/github.copilot/prompts/
-cp pull-repository.md ~/.config/Code/User/globalStorage/github.copilot/prompts/
+# Kopiere alle Prompts
+cp push-repository.md pull-repository.md pr-repository.md tag-push-repository.md ~/.config/Code/User/globalStorage/github.copilot/prompts/
 ```
 
-2. **Überprüfe, dass die Dateien richtig kopiert wurden:**
+2. **Überprüfe, dass alle Dateien richtig kopiert wurden:**
 
 ```bash
 ls -la ~/.config/Code/User/globalStorage/github.copilot/prompts/
@@ -27,20 +26,21 @@ Expected Output:
 ```
 -rw-r--r-- ... push-repository.md
 -rw-r--r-- ... pull-repository.md
+-rw-r--r-- ... pr-repository.md
+-rw-r--r-- ... tag-push-repository.md
 ```
 
 ### Windows
 
-1. **Kopiere die Prompt-Dateien zur globalen VS Code Copilot-Konfiguration:**
+1. **Kopiere alle Prompt-Dateien zur globalen VS Code Copilot-Konfiguration:**
 
 ```powershell
 # Erstelle das Verzeichnis, falls es nicht existiert
 $promptDir = "$env:APPDATA\Code\User\globalStorage\github.copilot\prompts"
 New-Item -ItemType Directory -Force -Path $promptDir
 
-# Kopiere die Prompts
-Copy-Item -Path "push-repository.md" -Destination "$promptDir\"
-Copy-Item -Path "pull-repository.md" -Destination "$promptDir\"
+# Kopiere alle Prompts
+Copy-Item -Path "push-repository.md", "pull-repository.md", "pr-repository.md", "tag-push-repository.md" -Destination "$promptDir\"
 ```
 
 2. **Überprüfe die Installation:**
@@ -49,58 +49,79 @@ Copy-Item -Path "pull-repository.md" -Destination "$promptDir\"
 Get-ChildItem "$env:APPDATA\Code\User\globalStorage\github.copilot\prompts\"
 ```
 
+## Übersicht
+
+| Prompt | Command | Funktion |
+|--------|---------|----------|
+| **Push Repository** | `/push-repository` | Git Push mit Diff-Anzeige & Auto-Commit-Messages |
+| **Pull Repository** | `/pull-repository` | Git Pull mit Fehlerbehandlung & Status-Check |
+| **PR Repository** | `/pr-repository` | GitHub PR erstellen & mergen mit Branch-Management & Issue-Linking |
+| **Tag Push Repository** | `/tag-push-repository` | Tag erstellen, Änderungen committen und pushen |
+
 ## Verwendung
 
-Nach der Installation kannst du die Commands in VS Code nutzen:
+Nach der Installation kopierst du die Befehle aus den einzelnen Prompt-Dateien und führst sie in deinem Terminal aus:
 
 ### `/push-repository`
 
-Führt einen intelligenten Git Push aus mit:
+**Schnellstart-Befehl:**
+```bash
+BRANCH=$(git branch --show-current) && git add . && echo "=== Changes ===" && git diff --cached --stat && git diff --cached && if git diff --cached --name-only | grep -qE "\.(py|js|ts)$"; then git commit -m "feat: Update scripts"; elif git diff --cached --name-only | grep -q "\.md$"; then git commit -m "docs: Update documentation"; else git commit -m "chore: Update repository"; fi && git push origin $BRANCH
+```
+
+**Features:**
 - ✅ Automatische Branch-Erkennung
 - ✅ Diff-Anzeige vor dem Commit
-- ✅ Intelligente Commit-Messages (Python, Markdown, Config, etc.)
+- ✅ Intelligente Commit-Messages
 - ✅ Automatischer Push zum Remote
 
-**Beispiel:**
-```bash
-/push-repository
-```
-
-Output:
-```
-=== Branch: main ===
-=== Changes zu committen (Statistik) ===
- README.md | 5 +++++
- 1 file changed, 5 insertions(+)
-
-=== Detaillierte Diffs ===
-[...Diffs werden angezeigt...]
-
-[main abc1234] Update documentation
- 1 file changed, 5 insertions(+)
-To github.com:username/repo.git
-   old..new  main -> main
-```
+Siehe [push-repository.md](push-repository.md) für 3 Varianten und Details.
 
 ### `/pull-repository`
 
-Führt einen intelligenten Git Pull aus mit:
-- ✅ Automatische Branch-Erkennung
-- ✅ Intelligente Fehlerbehandlung mit Rebase-Fallback
-- ✅ Status-Überprüfung
-
-**Beispiel:**
+**Schnellstart-Befehl:**
 ```bash
-/pull-repository
+BRANCH=$(git branch --show-current) && echo "=== Pulling from $BRANCH ===" && (git pull origin $BRANCH || git pull --rebase origin $BRANCH) && echo "✓ Pull successful" || echo "✗ Pull failed"
 ```
 
-Output:
+**Features:**
+- ✅ Automatische Branch-Erkennung
+- ✅ Intelligente Fehlerbehandlung
+- ✅ Rebase-Fallback bei Konflikten
+
+Siehe [pull-repository.md](pull-repository.md) für 3 Varianten und Details.
+
+### `/pr-repository`
+
+**Schnellstart-Befehl:**
+```bash
+gh pr create --title "Feature: $(git log -1 --pretty=%B)" --body "Auto-generated PR" --fill && gh pr merge --auto
 ```
-Aktualisieren von abc1234..def5678
-Fast-forward
- README.md | 3 +++
- 1 file changed, 3 insertions(+)
+
+**Anforderung:** GitHub CLI (`gh`) installiert
+
+**Features:**
+- ✅ GitHub PR erstellen
+- ✅ Auto-Merge
+- ✅ Issue-Linking (Fixes #123)
+- ✅ Draft-PRs
+
+Siehe [pr-repository.md](pr-repository.md) für 3 Varianten und Details.
+
+### `/tag-push-repository`
+
+**Schnellstart-Befehl:**
+```bash
+git add . && git commit -m "chore: Release v1.0.5" && git tag -a v1.0.5 -m "Release v1.0.5" && git push origin main --tags
 ```
+
+**Features:**
+- ✅ Semantic Versioning (v.X.Y.Z)
+- ✅ Tag-Erstellung
+- ✅ Pre-Release Support
+- ✅ Automatischer Push
+
+Siehe [tag-push-repository.md](tag-push-repository.md) für 3 Varianten und Details.
 
 ## Dateistruktur
 
@@ -108,7 +129,9 @@ Fast-forward
 prompts/
 ├── README.md                 # Diese Datei
 ├── push-repository.md        # Push-Prompt mit Diff-Anzeige
-└── pull-repository.md        # Pull-Prompt mit Fehlerbehandlung
+├── pull-repository.md        # Pull-Prompt mit Fehlerbehandlung
+├── pr-repository.md          # PR-Prompt mit GitHub Integration
+└── tag-push-repository.md    # Tag-Prompt für Versioning & Releases
 ```
 
 ## Anforderungen
@@ -182,15 +205,17 @@ Falls nicht vorhanden, kopiere die Dateien nochmal.
 
 ## Tipps & Best Practices
 
-1. **Immer die Diffs überprüfen** - Der Prompt zeigt dir immer die Changes vor dem Commit
-2. **Regelmäßig pullen** - Nutze `/pull-repository` am Anfang der Arbeit
-3. **Aussagekräftige Commits** - Die Auto-Detection basiert auf Dateitypen
-4. **Testen vor Push** - Bei wichtigen Changes: erst lokal testen, dann pushen
+1. **Kopiere die Schnellstart-Befehle** - Alle Prompts haben Copy-Ready Befehle am Anfang
+2. **3 Varianten pro Prompt** - Wähle zwischen Automatisch, Flexibel oder Einfach
+3. **Befehle kombinieren** - Pull → Work → Push → PR → Tag-Release Workflow
+4. **Tabellen nutzen** - Parameter, Befehle und Fehlerbehandlung sind in Tabellen organisiert
 
 ## Weitere Dokumentation
 
 - [push-repository.md](push-repository.md) - Detaillierte Push-Anweisungen
 - [pull-repository.md](pull-repository.md) - Detaillierte Pull-Anweisungen
+- [pr-repository.md](pr-repository.md) - Detaillierte PR-Management-Anweisungen
+- [tag-push-repository.md](tag-push-repository.md) - Detaillierte Tag & Release-Anweisungen
 
 ## Support
 

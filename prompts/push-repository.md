@@ -1,126 +1,122 @@
-# Push Repository Command
+# Push Repository Prompt
 
-Führe einen Git Push mit automatischem Branch-Erkennung, Diff-Anzeige und intelligenter Commit-Message durch.
+Intelligentes Git Push mit automatischer Branch-Erkennung, Diff-Anzeige und intelligenten Commit-Messages.
 
-## Anweisung (Automatisiert mit Diff-Anzeige)
+## Schnellstart
 
-Führe diesen Combined-Befehl aus, der automatisch arbeitet und Diffs zeigt:
+Kopiere diesen Befehl und führe ihn aus:
+
+```bash
+BRANCH=$(git branch --show-current) && git add . && echo "=== Changes ===" && git diff --cached --stat && git diff --cached && if git diff --cached --name-only | grep -qE "\.(py|js|ts)$"; then git commit -m "feat: Update scripts"; elif git diff --cached --name-only | grep -q "\.md$"; then git commit -m "docs: Update documentation"; else git commit -m "chore: Update repository"; fi && git push origin $BRANCH
+```
+
+## Was dieser Befehl macht
+
+1. ✅ **Branch-Erkennung** - Automatisch aktuellen Branch ermitteln
+2. ✅ **Änderungen hinzufügen** - `git add .`
+3. ✅ **Diffs anzeigen** - Statistik + Detaillierte Diffs
+4. ✅ **Auto-Commit-Message** - Intelligente Messages basierend auf Dateitypen
+5. ✅ **Push** - Zum Remote pushen
+
+## Verwendung (3 Varianten)
+
+### Variante 1: Automatisch (Empfohlen)
+
+```bash
+BRANCH=$(git branch --show-current) && git add . && echo "=== Changes ===" && git diff --cached --stat && git diff --cached && if git diff --cached --name-only | grep -qE "\.(py|js|ts)$"; then git commit -m "feat: Update scripts"; elif git diff --cached --name-only | grep -q "\.md$"; then git commit -m "docs: Update documentation"; else git commit -m "chore: Update repository"; fi && git push origin $BRANCH
+```
+
+**Beste Wahl:** Zeigt Diffs, committed automatisch, pusht.
+
+### Variante 2: Mit manueller Commit-Message
 
 ```bash
 BRANCH=$(git branch --show-current)
-echo "=== Branch: $BRANCH ==="
 git add .
-echo ""
-echo "=== Changes zu committen (Statistik) ==="
-git diff --cached --stat
-echo ""
-echo "=== Detaillierte Diffs ==="
-git diff --cached
-echo ""
-# Auto-Commit mit intelligenter Message
-if git diff --cached --name-only | grep -q "\.py$"; then
-  git commit -m "Update Python scripts"
-elif git diff --cached --name-only | grep -q "\.md$"; then
-  git commit -m "Update documentation"
-elif git diff --cached --name-only | grep -q "\.json$"; then
-  git commit -m "Update configuration"
-else
-  git commit -m "Update repository"
-fi
+echo "=== Changes ===" && git diff --cached --stat && git diff --cached
+read -p "Commit-Message: " MSG
+git commit -m "$MSG"
 git push origin $BRANCH
 ```
 
-## Anweisung (Mit Benutzer-Input und Diff-Anzeige)
+**Flexible Wahl:** Du kontrollierst die Commit-Message.
 
-Falls du die Commit-Message manuell eingeben möchtest:
-
-```bash
-BRANCH=$(git branch --show-current)
-echo "=== Branch: $BRANCH ==="
-git add .
-echo ""
-echo "=== Changes zu committen ==="
-git diff --cached --stat
-echo ""
-echo "=== Detaillierte Diffs ==="
-git diff --cached
-echo ""
-read -p "Commit-Message [Auto-generiert]: " CUSTOM_MSG
-if [ -n "$CUSTOM_MSG" ]; then
-  git commit -m "$CUSTOM_MSG"
-else
-  if git diff --cached --name-only | grep -q "\.py$"; then
-    git commit -m "Update Python scripts"
-  elif git diff --cached --name-only | grep -q "\.md$"; then
-    git commit -m "Update documentation"
-  else
-    git commit -m "Update repository"
-  fi
-fi
-git push origin $BRANCH
-```
-
-## Anweisung (Nur spezifische Dateien)
+### Variante 3: Nur spezifische Dateien
 
 ```bash
-BRANCH=$(git branch --show-current)
-git add <datei1> <datei2>
-echo "=== Changes zu committen ==="
-git diff --cached --stat
+git add file1.md file2.py
+git diff --cached --stat && git diff --cached
 git commit -m "Update specific files"
-git push origin $BRANCH
+git push origin $(git branch --show-current)
 ```
 
-## Parameter
+**Präzise Wahl:** Nur bestimmte Dateien.
 
-- `#selection` - Wenn Text ausgewählt ist, als Commit-Nachricht verwenden
-- `#file` - Optional: Nur eine bestimmte Datei pushen
+## Auto-Detection Commit-Messages
 
-## Workflow
+| Dateityp | Message |
+|----------|---------|
+| `*.py`, `*.js`, `*.ts` | `feat: Update scripts` |
+| `*.md` | `docs: Update documentation` |
+| `*.json`, `*.yml` | `chore: Update configuration` |
+| Andere | `chore: Update repository` |
 
-### Scenario 1: Automatisch mit Diffs anzeigen (Empfohlen)
+## Tipps & Tricks
+
+| Befehl | Beschreibung |
+|--------|-------------|
+| `git diff --cached --stat` | Übersicht: Welche Dateien, wie viele Änderungen |
+| `git diff --cached` | Detaillierte Diffs aller Änderungen |
+| `git log --oneline -5` | Letzte 5 Commits anzeigen |
+| `git status` | Status vor Commit überprüfen |
+| `git reset` | Alle `git add` rückgängig machen |
+
+## Fehlerbehandlung
+
+| Problem | Lösung |
+|---------|--------|
+| **rejected (fetch first)** | Erst `git pull` machen |
+| **SSH-Passphrase gefragt** | `eval $(ssh-agent -s) && ssh-add ~/.ssh/id_ed25519` |
+| **Nichts zum Committen** | `git status` - gibt es Änderungen? |
+| **Wrong branch** | `git checkout correct-branch` zuerst |
+| **Force Push nötig** | `git push --force-with-lease` (vorsichtig!) |
+
+## Workflow-Beispiel
+
 ```bash
-BRANCH=$(git branch --show-current) && git add . && \
-echo "=== Changes ===" && git diff --cached --stat && \
-git diff --cached && \
-if git diff --cached --name-only | grep -q "\.py$"; then \
-  git commit -m "Update Python scripts"; \
-elif git diff --cached --name-only | grep -q "\.md$"; then \
-  git commit -m "Update documentation"; \
-else \
-  git commit -m "Update repository"; \
-fi && \
-git push origin $BRANCH
+# 1. Änderungen machen
+vim README.md
+
+# 2. Status checken
+git status
+
+# 3. Pushen (dieser Prompt)
+BRANCH=$(git branch --show-current) && git add . && git diff --cached --stat && git diff --cached && git commit -m "docs: Update README" && git push origin $BRANCH
+
+# 4. Erfolg prüfen
+git log --oneline -3
 ```
 
-### Scenario 2: Mit manueller Bestätigung
+## Best Practices
+
+✅ **DO:**
+- Diffs vor Commit überprüfen
+- Aussagekräftige Commit-Messages
+- Kleine, fokussierte Commits
+- Regelmäßig pushen (nicht warten)
+
+❌ **DON'T:**
+- Unkontrolliert `git add .` nutzen
+- Große Multi-Feature Commits
+- Ohne zu überprüfen pushen
+- Force-Push auf main/master
+
+## Integration mit anderen Prompts
+
 ```bash
-git add .
-git diff --cached --stat
-echo "Überprüfe die Diffs oben"
-read -p "Weiter mit Enter..."
-git commit -m "MESSAGE"
-git push
+# Workflow: Pull → Work → Push
+/pull-repository        # Zuerst aktualisieren
+# ... work ...
+/push-repository        # Dann pushen
+/pr-repository --target main  # Optional: PR erstellen
 ```
-
-### Scenario 3: Nur Diffs anzeigen (ohne Push)
-```bash
-git diff
-git diff --stat
-```
-
-## Tipps
-
-- `git diff --cached --stat` zeigt eine schöne Statistik
-- `git diff --cached` zeigt alle Änderungen im Detail
-- Überprüfe die Diffs IMMER vor dem Commit
-- Intelligente Messages: Python, Dokumentation, Config etc. werden erkannt
-- `git log --oneline -5` zeigt letzte Commits
-- Bei Problemen: `git push --force-with-lease` nur wenn wirklich nötig
-
-## Häufige Fehler
-
-- **"rejected (fetch first)":** Erst pullen mit `/pull-repository`
-- **SSH-Passphrase:** SSH-Agent starten mit `eval $(ssh-agent -s) && ssh-add`
-- **Nichts zu committen:** Nur `git push` ohne add/commit
-- **Diff zu groß:** Nutze `git diff --stat` für Überblick statt vollständigem Diff

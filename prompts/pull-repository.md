@@ -1,81 +1,118 @@
-# Pull Repository Command
+# Pull Repository Prompt
 
-Führe einen Git Pull mit intelligenter Fehlerbehandlung durch.
+Intelligentes Git Pull mit automatischer Branch-Erkennung und Fehlerbehandlung mit Rebase-Fallback.
 
-## Anweisung (Automatisiert)
+## Schnellstart
 
-Führe diesen Combined-Befehl aus, der automatisch den aktuellen Branch ermittelt und pullst:
+Kopiere diesen Befehl und führe ihn aus:
 
 ```bash
-BRANCH=$(git branch --show-current) && git pull origin $BRANCH || git pull --rebase origin $BRANCH
+BRANCH=$(git branch --show-current) && echo "=== Pulling from $BRANCH ===" && (git pull origin $BRANCH || git pull --rebase origin $BRANCH) && echo "✓ Pull successful" || echo "✗ Pull failed"
 ```
 
-**Was dieser Befehl macht:**
-1. `BRANCH=$(git branch --show-current)` - Ermittelt den aktuellen Branch-Namen
-2. `git pull origin $BRANCH` - Pullst vom entsprechenden Remote-Branch
-3. Falls das fehlschlägt (`||`) - Fallback zu `git pull --rebase origin $BRANCH`
+## Was dieser Befehl macht
 
-## Anweisung (Schritt-für-Schritt)
+1. ✅ **Branch-Erkennung** - Automatisch aktuellen Branch ermitteln
+2. ✅ **Pull versuchen** - `git pull origin $BRANCH`
+3. ✅ **Fallback bei Fehler** - Bei Konflikt: Rebase-Pull
+4. ✅ **Status-Meldung** - Erfolg/Fehler anzeigen
 
-Alternativ, falls du lieber manuelle Kontrolle möchtest:
+## Verwendung (3 Varianten)
 
-1. **Aktuellen Branch ermitteln:**
-   ```bash
-   git branch --show-current
-   ```
+### Variante 1: Automatisch mit Fehlerbehandlung (Empfohlen)
 
-2. **Git Pull vom Remote-Repository versuchen:**
-   ```bash
-   git pull origin <BRANCH_NAME>
-   ```
-   - Ersetzt `<BRANCH_NAME>` mit dem ermittelten Branch (z.B. `main`, `develop`)
+```bash
+BRANCH=$(git branch --show-current) && echo "=== Pulling from $BRANCH ===" && (git pull origin $BRANCH || git pull --rebase origin $BRANCH) && echo "✓ Pull successful" || echo "✗ Pull failed"
+```
 
-3. **Bei Fehler: Rebase-Pull als Fallback:**
-   Falls Schritt 2 fehlschlägt:
-   ```bash
-   git pull --rebase origin <BRANCH_NAME>
-   ```
+**Beste Wahl:** Auto-Pull mit Rebase-Fallback bei Konflikten.
 
-4. **Status überprüfen:**
-   ```bash
-   git status
-   ```
+### Variante 2: Nur normaler Pull (ohne Rebase)
 
-## Parameter
-
-- `#file` - Optional: Nur eine bestimmte Datei aktualisieren
-- `#selection` - Optional: Nur selektive Branches pullen
-
-## Workflow
-
-### Scenario 1: Normaler Pull
 ```bash
 BRANCH=$(git branch --show-current)
 git pull origin $BRANCH
+git status
 ```
 
-### Scenario 2: Pull mit Rebase bei Konflikt
+**Einfach & Direkt:** Nur Pull ohne Rebase-Fallback.
+
+### Variante 3: Spezifischen Branch pullen
+
 ```bash
-BRANCH=$(git branch --show-current)
-git pull origin $BRANCH || git pull --rebase origin $BRANCH
+git pull origin main      # Oder: develop, feature/branch, etc.
+git status               # Status überprüfen
 ```
 
-### Scenario 3: Nur bestimmten Branch pullen
+**Flexibel:** Explizit einen bestimmten Branch angeben.
+
+## Pull-Szenarien
+
+| Szenario | Befehl | Wann nutzen |
+|----------|--------|-----------|
+| **Normal Pull** | `git pull origin $BRANCH` | Keine lokalen Änderungen |
+| **Mit Rebase** | `git pull --rebase origin $BRANCH` | Lineare History erwünscht |
+| **Fetch first** | `git fetch && git rebase origin/$BRANCH` | Nur informieren, nicht sofort mergen |
+| **Stash + Pull** | `git stash && git pull && git stash pop` | Lokale Änderungen, aber wollen nicht committen |
+
+## Fehlerbehandlung
+
+| Problem | Ursache | Lösung |
+|---------|--------|--------|
+| **Local changes overwritten** | Uncommitted Änderungen | `git stash` dann nochmal pullen |
+| **Rebase conflict** | Unterschiedliche Historien | Manuell auflösen: `git rebase --continue` |
+| **Branch not found** | Falscher Branch-Name | `git branch -a` - alle Branches anzeigen |
+| **Pull timeout** | Netzwerkproblem | `git fetch` versuchen |
+| **Already up to date** | Nichts Neues zu pullen | OK - alles aktuell |
+
+## Hilfsbefehle
+
+| Befehl | Beschreibung |
+|--------|-------------|
+| `git status` | Aktuellen Status anzeigen |
+| `git branch --show-current` | Aktuellen Branch anzeigen |
+| `git branch -a` | Alle Branches (lokal + remote) |
+| `git fetch` | Nur Remote-Infos abrufen (kein Merge) |
+| `git log --oneline -5` | Letzte 5 Commits |
+| `git stash` | Lokale Änderungen speichern |
+| `git stash pop` | Gespeicherte Änderungen wiederherstellen |
+
+## Workflow-Beispiel
+
 ```bash
-git pull origin main
-git pull --rebase origin main  # Falls Fehler
+# 1. Status vor Pull
+git status
+
+# 2. Pull mit Auto-Fallback
+BRANCH=$(git branch --show-current) && git pull origin $BRANCH || git pull --rebase origin $BRANCH
+
+# 3. Status nach Pull
+git status
+
+# 4. Neue Commits anschauen
+git log --oneline -3
 ```
 
-## Tipps
+## Best Practices
 
-- Verwende `git fetch` um Remote-Changes zu sehen, bevor du pullst
-- Bei Rebase-Konflikten: `git rebase --abort` um abzubrechen
-- `git log --oneline -5` zeigt die letzten Commits
-- Stelle sicher, dass deine lokalen Änderungen committed sind
-- Nutze `git status` vor und nach dem Pull
+✅ **DO:**
+- Pull am Anfang der Arbeit
+- Status vor & nach Pull überprüfen
+- Lokale Änderungen vor Pull committen oder stashen
+- Bei Konflikten: Rebase abbrechen & neu starten
 
-## Häufige Fehler
+❌ **DON'T:**
+- Pull ohne Status zu prüfen
+- Force-Pull auf gemeinsamen Branches
+- Pull mit uncommitted Änderungen
+- Rebase auf öffentlichen Branches
 
-- **"Your local changes would be overwritten":** Zuerst committen oder stashen
-- **Rebase-Konflikt:** Manuell auflösen und `git rebase --continue`
-- **Branch diverged:** Mit `git pull --rebase` die History neu aufbauen
+## Integration mit anderen Prompts
+
+```bash
+# Workflow: Pull → Work → Push
+/pull-repository            # Zuerst aktualisieren
+# ... work ...
+/push-repository            # Dann pushen
+/pr-repository --target main  # Optional: PR erstellen
+```
