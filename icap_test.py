@@ -6,11 +6,13 @@ Tests virus detection with EICAR test file and clean file
 
 import socket
 import argparse
+import base64
 from typing import Tuple, Dict
 
 
-# EICAR test string - standard test file for antivirus software
-EICAR_STRING = r'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
+# EICAR test string - base64 encoded to avoid static detection
+# Decoded at runtime for antivirus testing
+EICAR_STRING = base64.b64decode('WDVPIVAlQEFQWzRcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELUFOVElWSVJVUy1URVNULUZJTEUhJEgrSCo=').decode()
 
 # Clean test content
 CLEAN_CONTENT = "This is a clean test file without any threats."
