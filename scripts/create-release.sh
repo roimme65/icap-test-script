@@ -265,7 +265,15 @@ else
     fi
 fi
 
-# Schritt 3: CHANGELOG.md aktualisieren (oder erstellen)
+# Schritt 3: README.md Version-Badge aktualisieren
+print_info "Aktualisiere Version-Badge in README.md..."
+if sed -i "s/badge\/version-[0-9.]*-blue/badge\/version-${NEW_VERSION}-blue/" README.md; then
+    print_success "README.md Version aktualisiert: ${NEW_VERSION}"
+else
+    print_warning "README.md Badge konnte nicht aktualisiert werden"
+fi
+
+# Schritt 4: CHANGELOG.md aktualisieren (oder erstellen)
 print_info "Aktualisiere CHANGELOG.md..."
 
 if [ ! -f "CHANGELOG.md" ]; then
@@ -300,9 +308,9 @@ mv CHANGELOG.md.new CHANGELOG.md
 
 print_success "CHANGELOG.md aktualisiert"
 
-# Schritt 4: Git commit
+# Schritt 5: Git commit
 print_info "Erstelle Git-Commit..."
-git add VERSION "$RELEASE_NOTES_FILE" CHANGELOG.md
+git add VERSION "$RELEASE_NOTES_FILE" CHANGELOG.md README.md
 git commit -m "Release v${NEW_VERSION}
 
 - Bump version to v${NEW_VERSION}
@@ -310,18 +318,18 @@ git commit -m "Release v${NEW_VERSION}
 - Update CHANGELOG"
 print_success "Commit erstellt"
 
-# Schritt 5: Git Tag erstellen
+# Schritt 6: Git Tag erstellen
 print_info "Erstelle Git-Tag v${NEW_VERSION}..."
 git tag -a "v${NEW_VERSION}" -m "Release ${NEW_VERSION}"
 print_success "Tag erstellt: v${NEW_VERSION}"
 
-# Schritt 6: Push zu GitHub
+# Schritt 7: Push zu GitHub
 print_info "Pushe zu GitHub..."
 git push origin main
 git push origin "v${NEW_VERSION}"
 print_success "Gepusht zu GitHub"
 
-# Schritt 7: Erstelle GitHub Release
+# Schritt 8: Erstelle GitHub Release
 print_info "Erstelle GitHub Release..."
 
 # Warte kurz, damit GitHub den Tag registriert
