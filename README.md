@@ -417,3 +417,6 @@ Siehe [LICENSE](LICENSE) Datei für Details.
 ## ✨ Credits
 
 Erstellt für ICAP-Funktionstests und Virenscanner-Validierung mit Fokus auf Einfachheit und Wartbarkeit.
+
+
+
