@@ -1,3 +1,4 @@
+---
 name: Release
 run-name: 🚀 Release - ${{ github.ref_name }}
 
@@ -27,9 +28,10 @@ jobs:
       - name: Verify version tag
         run: |
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
-          SCRIPT_VERSION=$(grep "__version__" icap_test.py | head -1 | grep -oP '\K[0-9]+\.[0-9]+\.[0-9]+')
-          if [ "$TAG_VERSION" != "$SCRIPT_VERSION" ]; then
-            echo "❌ Version mismatch: Tag=$TAG_VERSION, Script=$SCRIPT_VERSION"
+          VER=$(grep "__version__" icap_test.py | head -1 | \
+            grep -oP '\K[0-9]+\.[0-9]+\.[0-9]+')
+          if [ "$TAG_VERSION" != "$VER" ]; then
+            echo "❌ Version mismatch: Tag=$TAG_VERSION, Script=$VER"
             exit 1
           fi
           echo "✓ Version matches: $TAG_VERSION"

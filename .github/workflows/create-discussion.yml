@@ -1,5 +1,6 @@
+---
 name: Create Release Discussion
-run-name: 💬 ICAP Release Discussion - ${{ github.ref_name }}
+run-name: 💬 Release Discussion - ${{ github.ref_name }}
 
 on:
   push:
@@ -25,67 +26,52 @@ jobs:
           REPO="${GITHUB_REPOSITORY}"
           OWNER="${REPO%/*}"
           REPO_NAME="${REPO#*/}"
-          
-          echo "Creating discussion for ICAP release: $VERSION"
-          
+
+          echo "Creating discussion for ICAP: $VERSION"
+
           # Hole Repository ID
           REPO_ID=$(curl -s -X POST https://api.github.com/graphql \
             -H "Authorization: bearer ${GITHUB_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "{\"query\": \"query { repository(owner: \\\"$OWNER\\\", name: \\\"$REPO_NAME\\\") { id } }\"}" \
             | jq -r '.data.repository.id')
-          
+
           echo "Repository ID: $REPO_ID"
-          
+
           if [ "$REPO_ID" = "null" ] || [ -z "$REPO_ID" ]; then
             echo "❌ Could not get repository ID"
             exit 1
           fi
-          
-          # Hole erste Discussion Category ID  
+
+          # Hole erste Discussion Category ID
           CAT_ID=$(curl -s -X POST https://api.github.com/graphql \
             -H "Authorization: bearer ${GITHUB_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "{\"query\": \"query { repository(owner: \\\"$OWNER\\\", name: \\\"$REPO_NAME\\\") { discussionCategories(first: 1) { edges { node { id } } } } }\"}" \
             | jq -r '.data.repository.discussionCategories.edges[0].node.id // empty')
-          
+
           echo "Category ID: ${CAT_ID:-(none)}"
-          
-          # Erstelle Discussion mit einfachem Body für ICAP
-          BODY="🚀 ICAP Security Testing Suite Release $VERSION
 
-Die neue Version ist jetzt verfügbar!
+          # Erstelle Discussion mit ICAP Release Info
+          BODY_TEXT="🚀 ICAP Security Testing Suite Release $VERSION\n\nRelease Notes: https://github.com/$REPO/releases/tag/$VERSION"
 
-Installation:
-git clone https://github.com/$REPO.git
-cd icap-test-script
-git checkout $VERSION
-docker compose up -d
-
-Release Notes: https://github.com/$REPO/releases/tag/$VERSION
-
-Nutzen Sie diesen Thread um Fragen zu stellen, Feedback zu geben oder Probleme zu berichten."
-          
-          # Escapen des Body für JSON
-          BODY_JSON=$(echo "$BODY" | jq -Rs .)
-          
           if [ ! -z "$CAT_ID" ]; then
-            QUERY="{\"query\": \"mutation { createDiscussion(input: {repositoryId: \\\"$REPO_ID\\\", categoryId: \\\"$CAT_ID\\\", title: \\\"Release $VERSION - ICAP Security Testing Suite\\\", body: $BODY_JSON}) { discussion { id url } } }\"}"
+            QUERY="mutation { createDiscussion(input: {repositoryId: \\\"$REPO_ID\\\", categoryId: \\\"$CAT_ID\\\", title: \\\"Release $VERSION - ICAP Suite\\\", body: \\\"$BODY_TEXT\\\"}) { discussion { id url } } }"
           else
-            QUERY="{\"query\": \"mutation { createDiscussion(input: {repositoryId: \\\"$REPO_ID\\\", title: \\\"Release $VERSION - ICAP Security Testing Suite\\\", body: $BODY_JSON}) { discussion { id url } } }\"}"
+            QUERY="mutation { createDiscussion(input: {repositoryId: \\\"$REPO_ID\\\", title: \\\"Release $VERSION - ICAP Suite\\\", body: \\\"$BODY_TEXT\\\"}) { discussion { id url } } }"
           fi
-          
+
           echo "Executing mutation..."
           RESPONSE=$(curl -s -X POST https://api.github.com/graphql \
             -H "Authorization: bearer ${GITHUB_TOKEN}" \
             -H "Content-Type: application/json" \
-            -d "$QUERY")
-          
+            -d "{\"query\": \"$QUERY\"}")
+
           echo "Response: $RESPONSE"
-          
+
           # Prüfe auf Erfolg
           if echo "$RESPONSE" | jq -e '.data.createDiscussion.discussion.id' > /dev/null 2>&1; then
-            echo "✅ ICAP Release Discussion erstellt!"
+            echo "✅ Discussion erstellt!"
             URL=$(echo "$RESPONSE" | jq -r '.data.createDiscussion.discussion.url')
             echo "URL: $URL"
           else

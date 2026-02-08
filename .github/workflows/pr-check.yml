@@ -1,10 +1,11 @@
+---
 name: PR Check
 run-name: 🔍 PR Check - ${{ github.event.pull_request.title }}
 
 on:
   pull_request:
-    branches: [ main, develop ]
-    types: [ opened, synchronize, reopened ]
+    branches: [main, develop]
+    types: [opened, synchronize, reopened]
 
 jobs:
   pr-validation:
@@ -49,8 +50,12 @@ jobs:
 
       - name: Import check
         run: |
-          python -c "import ast; ast.parse(open('icap_test.py').read()); print('✓ icap_test.py is valid')"
-          python -c "import ast; ast.parse(open('icap_server.py').read()); print('✓ icap_server.py is valid')"
+          python -c "import ast; \
+            ast.parse(open('icap_test.py').read()); \
+            print('✓ icap_test.py valid')"
+          python -c "import ast; \
+            ast.parse(open('icap_server.py').read()); \
+            print('✓ icap_server.py valid')"
 
   file-changes:
     name: Changed Files Analysis
@@ -63,7 +68,10 @@ jobs:
 
       - name: Get changed files
         run: |
-          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} > /tmp/changed_files.txt
+          git diff --name-only \
+            ${{ github.event.pull_request.base.sha }} \
+            ${{ github.event.pull_request.head.sha }} \
+            > /tmp/changed_files.txt
           echo "Changed files:"
           cat /tmp/changed_files.txt
 

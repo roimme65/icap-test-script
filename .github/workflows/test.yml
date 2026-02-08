@@ -1,16 +1,17 @@
+---
 name: Tests
 run-name: 🧪 Tests - ${{ github.event_name }}
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'icap_*.py'
       - 'docker-compose.yml'
       - 'docker/**'
       - '.github/workflows/test.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'icap_*.py'
       - 'docker-compose.yml'
@@ -82,14 +83,17 @@ jobs:
 
       - name: Verify version consistency
         run: |
-          TEST_VER=$(grep "__version__" icap_test.py | head -1 | grep -oP '\K[0-9]+\.[0-9]+\.[0-9]+')
-          SERVER_VER=$(grep "__version__" icap_server.py | head -1 | grep -oP '\K[0-9]+\.[0-9]+\.[0-9]+')
+          TEST_VER=$(grep "__version__" icap_test.py | \
+            head -1 | grep -oP '\K[0-9]+\.[0-9]+\.[0-9]+')
+          SERVER_VER=$(grep "__version__" icap_server.py | \
+            head -1 | grep -oP '\K[0-9]+\.[0-9]+\.[0-9]+')
           FILE_VER=$(cat VERSION)
-          if [ "$TEST_VER" != "$SERVER_VER" ] || [ "$TEST_VER" != "$FILE_VER" ]; then
-            echo "❌ Version mismatch: TEST=$TEST_VER, SERVER=$SERVER_VER, FILE=$FILE_VER"
+          if [ "$TEST_VER" != "$SERVER_VER" ] || \
+             [ "$TEST_VER" != "$FILE_VER" ]; then
+            echo "❌ Version mismatch"
             exit 1
           fi
-          echo "✓ Versions are consistent: $TEST_VER"
+          echo "✓ Versions consistent: $TEST_VER"
 
   lint-check:
     name: Linting & Style Check
@@ -110,11 +114,13 @@ jobs:
       - name: Run flake8 checks
         continue-on-error: true
         run: |
-          flake8 icap_test.py icap_server.py --max-line-length=120 --count --show-source
+          flake8 icap_test.py icap_server.py \
+            --max-line-length=120 --count --show-source
           echo "✓ Flake8 check complete"
 
       - name: Run pylint checks
         continue-on-error: true
         run: |
-          pylint icap_test.py icap_server.py --disable=C0111 --max-line-length=120
+          pylint icap_test.py icap_server.py \
+            --disable=C0111 --max-line-length=120
           echo "✓ Pylint check complete"
