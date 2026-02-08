@@ -4,7 +4,7 @@ Simple ICAP Server with ClamAV integration
 Handles REQMOD/RESPMOD requests and scans files with ClamAV
 """
 
-__version__ = "1.2.1"
+__version__ = "1.1.2"
 __author__ = "Roland Imme"
 
 import socket

@@ -141,6 +141,54 @@ class VersionManager:
                     f.write(new_content)
                 print_success(f"Aktualisiert: {pattern_info['file']}")
         
+        # Update version in README files (bottom section)
+        for readme_file in ['README.md', 'README.de.md']:
+            readme_path = self.project_root / readme_file
+            if readme_path.exists():
+                with open(readme_path, 'r') as f:
+                    content = f.read()
+                
+                # Update Version line
+                new_content = re.sub(
+                    r'(\*\*(?:Version|Version):\*\*\s+)\d+\.\d+\.\d+',
+                    f'\\g<1>{new_version}',
+                    content
+                )
+                
+                if new_content != content:
+                    with open(readme_path, 'w') as f:
+                        f.write(new_content)
+                    print_success(f"Aktualisiert Version in: {readme_file}")
+        
+        # Update SECURITY.md
+        security_path = self.project_root / 'SECURITY.md'
+        if security_path.exists():
+            with open(security_path, 'r') as f:
+                content = f.read()
+            
+            # Extract major.minor for X.Y.x format
+            major_minor = '.'.join(new_version.split('.')[:2])
+            today = datetime.now().strftime('%B %d, %Y')
+            
+            # Update Current Version line (1.1.x format)
+            new_content = re.sub(
+                r'(\*\*Current Version:\*\*\s+)\d+\.\d+\.x',
+                f'\\g<1>{major_minor}.x',
+                content
+            )
+            
+            # Update Last Updated date
+            new_content = re.sub(
+                r'(\*\*Last Updated:\*\*\s+)\w+\s+\d+,\s+\d+',
+                f'\\g<1>{today}',
+                new_content
+            )
+            
+            if new_content != content:
+                with open(security_path, 'w') as f:
+                    f.write(new_content)
+                print_success(f"Aktualisiert: SECURITY.md")
+        
         self.current_version = new_version
 
 class ReleaseManager:

@@ -53,7 +53,8 @@ jobs:
       - name: Build ICAP Server image
         uses: docker/build-push-action@v5
         with:
-          context: ./docker/icap-server
+          context: .
+          file: ./docker/icap-server/Dockerfile
           push: false
           tags: icap-server:test
           cache-from: type=gha

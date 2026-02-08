@@ -177,6 +177,6 @@ Thank you to everyone who responsibly reports security vulnerabilities and helps
 
 ---
 
-**Last Updated:** February 8, 2026  
+**Last Updated:** February 08, 2026  
 **Current Version:** 1.1.x  
 **Security Policy Version:** 1.0
