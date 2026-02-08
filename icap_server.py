@@ -4,7 +4,7 @@ Simple ICAP Server with ClamAV integration
 Handles REQMOD/RESPMOD requests and scans files with ClamAV
 """
 
-__version__ = "1.1.5"
+__version__ = "1.1.6"
 __author__ = "Roland Imme"
 
 import socket
@@ -12,6 +12,7 @@ import socketserver
 import threading
 import logging
 import argparse
+import sys
 from typing import Tuple, Optional
 
 # Configure logging
@@ -20,6 +21,26 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger('icap-server')
+
+
+# Colors for output
+class Colors:
+    HEADER = '\033[95m'
+    OBJCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    OKBLUE = '\033[94m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+
+
+# GitHub Repository Information
+GITHUB_REPO = 'https://github.com/roimme65/icap-test-script'
+GITHUB_ISSUES = 'https://github.com/roimme65/icap-test-script/issues'
+GITHUB_DISCUSSIONS = 'https://github.com/roimme65/icap-test-script/discussions'
+GITHUB_ISSUE_TEMPLATE_BUG = f'{GITHUB_ISSUES}/new?labels=bug&template=bug_report.yml'
+GITHUB_ISSUE_TEMPLATE_FEATURE = f'{GITHUB_ISSUES}/new?labels=enhancement&template=feature_request.yml'
 
 
 class ClamAVClient:
@@ -265,24 +286,40 @@ def main():
                         version=f'%(prog)s {__version__}')
     parser.add_argument('--author', action='store_true',
                         help='Show author information')
+    parser.add_argument('--repository', action='store_true',
+                        help='Show GitHub repository information')
+    parser.add_argument('--support', action='store_true',
+                        help='Show support and issue template links')
     parser.add_argument('--host', default='0.0.0.0',
                         help='Server host (default: 0.0.0.0)')
     parser.add_argument('--port', type=int, default=1344,
                         help='Server port (default: 1344)')
-    
+
     args = parser.parse_args()
-    
+
     if args.author:
         logger.info(f"ICAP Server")
         logger.info(f"Version: {__version__}")
         logger.info(f"Author: {__author__}")
         return
-    
-    host = args.host
-    port = args.port
-    
-    # Test ClamAV connection
-    clamav = ClamAVClient()
+
+    if args.repository:
+        print(f"\n{Colors.HEADER}{Colors.BOLD}GitHub Repository Information{Colors.ENDC}")
+        print(f"  Repository: {GITHUB_REPO}")
+        print(f"  Issues: {GITHUB_ISSUES}")
+        print(f"  Discussions: {GITHUB_DISCUSSIONS}")
+        print()
+        return
+
+    if args.support:
+        print(f"\n{Colors.HEADER}{Colors.BOLD}Support & Issue Templates{Colors.ENDC}")
+        print(f"\n{Colors.OKGREEN}Report a Bug:{Colors.ENDC}")
+        print(f"  {GITHUB_ISSUE_TEMPLATE_BUG}")
+        print(f"\n{Colors.OKGREEN}Request a Feature:{Colors.ENDC}")
+        print(f"  {GITHUB_ISSUE_TEMPLATE_FEATURE}")
+        print(f"\n{Colors.OKGREEN}Discussions:{Colors.ENDC}")
+        print(f"  {GITHUB_DISCUSSIONS}")
+        print()
     logger.info("Testing ClamAV connection...")
     if clamav.ping():
         logger.info("✓ ClamAV connection successful")
