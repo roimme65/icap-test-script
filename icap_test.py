@@ -4,7 +4,7 @@ ICAP Protocol Test Script
 Tests virus detection with EICAR test file and clean file
 """
 
-__version__ = "1.1.6"
+__version__ = "1.1.7"
 __author__ = "Roland Imme"
 
 import socket
@@ -308,6 +308,14 @@ def main():
         print(f"  {GITHUB_DISCUSSIONS}")
         print()
         return
+
+    # Initialize ICAP client
+    client = ICAPClient(args.host, args.port, args.service)
+    
+    print(f"\nICAP Test Script")
+    print(f"Target: icap://{args.host}:{args.port}/{args.service}")
+    print(f"{'='*60}")
+    
     # Test OPTIONS if requested
     if args.test_options:
         print("\n[1] Testing ICAP OPTIONS...")

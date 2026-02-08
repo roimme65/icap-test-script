@@ -4,7 +4,7 @@ Simple ICAP Server with ClamAV integration
 Handles REQMOD/RESPMOD requests and scans files with ClamAV
 """
 
-__version__ = "1.1.6"
+__version__ = "1.1.7"
 __author__ = "Roland Imme"
 
 import socket
@@ -320,6 +320,13 @@ def main():
         print(f"\n{Colors.OKGREEN}Discussions:{Colors.ENDC}")
         print(f"  {GITHUB_DISCUSSIONS}")
         print()
+        return
+
+    host = args.host
+    port = args.port
+
+    # Test ClamAV connection
+    clamav = ClamAVClient()
     logger.info("Testing ClamAV connection...")
     if clamav.ping():
         logger.info("✓ ClamAV connection successful")
