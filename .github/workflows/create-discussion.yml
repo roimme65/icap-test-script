@@ -10,6 +10,7 @@ on:
 jobs:
   create-discussion:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
       discussions: write
@@ -22,6 +23,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -x
           VERSION="${GITHUB_REF#refs/tags/}"
           REPO="${GITHUB_REPOSITORY}"
           OWNER="${REPO%/*}"
@@ -30,30 +32,30 @@ jobs:
           echo "Creating discussion for ICAP: $VERSION"
 
           # Hole Repository ID
-          REPO_ID=$(curl -s -X POST https://api.github.com/graphql \
+          REPO_ID=$(timeout 10 curl -s -X POST https://api.github.com/graphql \
             -H "Authorization: bearer ${GITHUB_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "{\"query\": \"query { repository(owner: \\\"$OWNER\\\", name: \\\"$REPO_NAME\\\") { id } }\"}" \
-            | jq -r '.data.repository.id')
+            | jq -r '.data.repository.id // "error"')
 
           echo "Repository ID: $REPO_ID"
 
-          if [ "$REPO_ID" = "null" ] || [ -z "$REPO_ID" ]; then
+          if [ "$REPO_ID" = "null" ] || [ "$REPO_ID" = "error" ] || [ -z "$REPO_ID" ]; then
             echo "❌ Could not get repository ID"
             exit 1
           fi
 
-          # Hole erste Discussion Category ID
-          CAT_ID=$(curl -s -X POST https://api.github.com/graphql \
+          # Hole erste Discussion Category ID (optional)
+          CAT_ID=$(timeout 10 curl -s -X POST https://api.github.com/graphql \
             -H "Authorization: bearer ${GITHUB_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "{\"query\": \"query { repository(owner: \\\"$OWNER\\\", name: \\\"$REPO_NAME\\\") { discussionCategories(first: 1) { edges { node { id } } } } }\"}" \
-            | jq -r '.data.repository.discussionCategories.edges[0].node.id // empty')
+            | jq -r '.data.repository.discussionCategories.edges[0].node.id // empty' 2>/dev/null || echo "")
 
           echo "Category ID: ${CAT_ID:-(none)}"
 
           # Erstelle Discussion mit ICAP Release Info
-          BODY_TEXT="🚀 ICAP Security Testing Suite Release $VERSION\n\nRelease Notes: https://github.com/$REPO/releases/tag/$VERSION"
+          BODY_TEXT="ICAP Release $VERSION - Release Notes: https://github.com/$REPO/releases/tag/$VERSION"
 
           if [ ! -z "$CAT_ID" ]; then
             QUERY="mutation { createDiscussion(input: {repositoryId: \\\"$REPO_ID\\\", categoryId: \\\"$CAT_ID\\\", title: \\\"Release $VERSION - ICAP Suite\\\", body: \\\"$BODY_TEXT\\\"}) { discussion { id url } } }"
@@ -62,7 +64,7 @@ jobs:
           fi
 
           echo "Executing mutation..."
-          RESPONSE=$(curl -s -X POST https://api.github.com/graphql \
+          RESPONSE=$(timeout 10 curl -s -X POST https://api.github.com/graphql \
             -H "Authorization: bearer ${GITHUB_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "{\"query\": \"$QUERY\"}")
@@ -72,9 +74,6 @@ jobs:
           # Prüfe auf Erfolg
           if echo "$RESPONSE" | jq -e '.data.createDiscussion.discussion.id' > /dev/null 2>&1; then
             echo "✅ Discussion erstellt!"
-            URL=$(echo "$RESPONSE" | jq -r '.data.createDiscussion.discussion.url')
-            echo "URL: $URL"
           else
-            ERROR=$(echo "$RESPONSE" | jq -r '.errors[0].message // "Unknown error"' 2>/dev/null || echo "JSON error")
-            echo "⚠️ Discussion konnte nicht erstellt werden: $ERROR"
+            echo "⚠️ Discussion creation failed or skipped"
           fi
