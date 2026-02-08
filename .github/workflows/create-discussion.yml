@@ -51,36 +51,35 @@ jobs:
           
           echo "Category ID: ${CAT_ID:-(none)}"
           
-          # Erstelle Discussion mit spezifischem Body für ICAP
-          BODY="🚀 **ICAP Security Testing Suite Release $VERSION**
+          # Erstelle Discussion mit einfachem Body für ICAP
+          BODY="🚀 ICAP Security Testing Suite Release $VERSION
 
 Die neue Version ist jetzt verfügbar!
 
-## 📥 Installation
-\`\`\`bash
+Installation:
 git clone https://github.com/$REPO.git
 cd icap-test-script
 git checkout $VERSION
 docker compose up -d
-\`\`\`
 
-## 📝 Release Notes
-Detaillierte Release Notes: https://github.com/$REPO/releases/tag/$VERSION
+Release Notes: https://github.com/$REPO/releases/tag/$VERSION
 
-## ❓ Discuss
 Nutzen Sie diesen Thread um Fragen zu stellen, Feedback zu geben oder Probleme zu berichten."
           
+          # Escapen des Body für JSON
+          BODY_JSON=$(echo "$BODY" | jq -Rs .)
+          
           if [ ! -z "$CAT_ID" ]; then
-            QUERY="mutation { createDiscussion(input: {repositoryId: \\\"$REPO_ID\\\", categoryId: \\\"$CAT_ID\\\", title: \\\"Release $VERSION - ICAP Security Testing Suite\\\", body: \"\"\"$BODY\"\"\"}) { discussion { id url } } }"
+            QUERY="{\"query\": \"mutation { createDiscussion(input: {repositoryId: \\\"$REPO_ID\\\", categoryId: \\\"$CAT_ID\\\", title: \\\"Release $VERSION - ICAP Security Testing Suite\\\", body: $BODY_JSON}) { discussion { id url } } }\"}"
           else
-            QUERY="mutation { createDiscussion(input: {repositoryId: \\\"$REPO_ID\\\", title: \\\"Release $VERSION - ICAP Security Testing Suite\\\", body: \"\"\"$BODY\"\"\"}) { discussion { id url } } }"
+            QUERY="{\"query\": \"mutation { createDiscussion(input: {repositoryId: \\\"$REPO_ID\\\", title: \\\"Release $VERSION - ICAP Security Testing Suite\\\", body: $BODY_JSON}) { discussion { id url } } }\"}"
           fi
           
           echo "Executing mutation..."
           RESPONSE=$(curl -s -X POST https://api.github.com/graphql \
             -H "Authorization: bearer ${GITHUB_TOKEN}" \
             -H "Content-Type: application/json" \
-            -d "{\"query\": \"$QUERY\"}")
+            -d "$QUERY")
           
           echo "Response: $RESPONSE"
           
