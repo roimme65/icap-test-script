@@ -4,7 +4,7 @@ ICAP Protocol Test Script
 Tests virus detection with EICAR test file and clean file
 """
 
-__version__ = "1.1.8"
+__version__ = "1.1.9"
 __author__ = "Roland Imme"
 
 import socket
