@@ -67,13 +67,13 @@ class VersionManager:
         # README.md - Version Badge
         {
             'file': 'README.md',
-            'pattern': r'(!\[Version\]\(https://img\.shields\.io/badge/version-)(\d+\.\d+\.\d+)(-blue\.svg\)\(VERSION\))',
+            'pattern': r'(badge/version-)(\d+\.\d+\.\d+)(-blue\.svg)',
             'replacement': r'\g<1>{version}\g<3>'
         },
         # README.de.md - Version Badge
         {
             'file': 'README.de.md',
-            'pattern': r'(!\[Version\]\(https://img\.shields\.io/badge/version-)(\d+\.\d+\.\d+)(-blue\.svg\)\(VERSION\))',
+            'pattern': r'(badge/version-)(\d+\.\d+\.\d+)(-blue\.svg)',
             'replacement': r'\g<1>{version}\g<3>'
         }
     ]
