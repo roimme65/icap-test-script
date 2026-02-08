@@ -1,0 +1,97 @@
+name: Bug Report
+description: Report a bug or issue
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping us improve! Please complete the form below to report this bug.
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: Which version of ICAP Test Script are you using?
+      options:
+        - 1.0.9
+        - 1.0.8
+        - 1.0.7
+        - Other (please specify)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - icap_test.py (test script)
+        - icap_server.py (ICAP server)
+        - Docker / docker-compose
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "Example: The test script fails when using --verbose flag with large files"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Run command: `python3 icap_test.py --verbose --host localhost`
+        2. Observe error in output
+        3. Check Docker logs
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen?
+      placeholder: "The test script should complete successfully without errors"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Please paste any relevant logs or error messages (use code blocks)
+      placeholder: |
+        ```
+        [ERROR] Connection refused: Cannot connect to ICAP server
+        ```
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Your environment details
+      placeholder: |
+        - OS: Ubuntu 22.04
+        - Python: 3.10.6
+        - Docker: 24.0.0
+        - Docker Compose: 2.20.0
+
+  - type: checkbox
+    id: confirmation
+    attributes:
+      label: Confirmation
+      description: Please confirm you have checked the documentation
+      options:
+        - label: I have read the README and DOCKER.md documentation
+          required: true

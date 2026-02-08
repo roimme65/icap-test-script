@@ -1,0 +1,92 @@
+name: Release
+run-name: 🚀 Release - ${{ github.ref_name }}
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check Python syntax
+        run: |
+          python -m py_compile icap_test.py icap_server.py
+          echo "✓ Python syntax is valid"
+
+      - name: Verify version tag
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          SCRIPT_VERSION=$(grep "__version__" icap_test.py | head -1 | grep -oP '\K[0-9]+\.[0-9]+\.[0-9]+')
+          if [ "$TAG_VERSION" != "$SCRIPT_VERSION" ]; then
+            echo "❌ Version mismatch: Tag=$TAG_VERSION, Script=$SCRIPT_VERSION"
+            exit 1
+          fi
+          echo "✓ Version matches: $TAG_VERSION"
+
+      - name: Check release notes exist
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/}"
+          if [ ! -f "releases/${TAG_VERSION}.md" ]; then
+            echo "❌ Release notes missing: releases/${TAG_VERSION}.md"
+            exit 1
+          fi
+          echo "✓ Release notes found"
+
+  create-release:
+    name: Create GitHub Release
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract release notes
+        id: extract_notes
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/}"
+          if [ -f "releases/${TAG_VERSION}.md" ]; then
+            {
+              echo 'body<<EOF'
+              cat "releases/${TAG_VERSION}.md"
+              echo 'EOF'
+            } >> $GITHUB_OUTPUT
+          else
+            echo "body=Release notes not available" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.extract_notes.outputs.body }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify:
+    name: Notify Release
+    needs: create-release
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Release successful
+        if: success()
+        run: echo "✓ Release ${{ github.ref_name }} created successfully!"
+
+      - name: Release failed
+        if: failure()
+        run: echo "❌ Release creation failed"

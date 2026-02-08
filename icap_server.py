@@ -4,10 +4,14 @@ Simple ICAP Server with ClamAV integration
 Handles REQMOD/RESPMOD requests and scans files with ClamAV
 """
 
+__version__ = "1.2.0"
+__author__ = "Roland Imme"
+
 import socket
 import socketserver
 import threading
 import logging
+import argparse
 from typing import Tuple, Optional
 
 # Configure logging
@@ -254,8 +258,28 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
 def main():
     """Start ICAP server"""
-    host = '0.0.0.0'
-    port = 1344
+    parser = argparse.ArgumentParser(
+        description='ICAP Server with ClamAV integration'
+    )
+    parser.add_argument('--version', action='version', 
+                        version=f'%(prog)s {__version__}')
+    parser.add_argument('--author', action='store_true',
+                        help='Show author information')
+    parser.add_argument('--host', default='0.0.0.0',
+                        help='Server host (default: 0.0.0.0)')
+    parser.add_argument('--port', type=int, default=1344,
+                        help='Server port (default: 1344)')
+    
+    args = parser.parse_args()
+    
+    if args.author:
+        logger.info(f"ICAP Server")
+        logger.info(f"Version: {__version__}")
+        logger.info(f"Author: {__author__}")
+        return
+    
+    host = args.host
+    port = args.port
     
     # Test ClamAV connection
     clamav = ClamAVClient()

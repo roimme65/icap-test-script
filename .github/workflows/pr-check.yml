@@ -1,0 +1,77 @@
+name: PR Check
+run-name: 🔍 PR Check - ${{ github.event.pull_request.title }}
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check PR description
+        run: |
+          if [ -z "${{ github.event.pull_request.body }}" ]; then
+            echo "⚠️  PR description is empty"
+          else
+            echo "✓ PR description provided"
+          fi
+
+      - name: Check for conflicts
+        run: |
+          if [ "${{ github.event.pull_request.mergeable }}" != "true" ]; then
+            echo "❌ PR has merge conflicts"
+            exit 1
+          fi
+          echo "✓ No merge conflicts"
+
+  python-checks:
+    name: Python Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Syntax validation
+        run: |
+          python -m py_compile icap_test.py icap_server.py
+          echo "✓ Python syntax is valid"
+
+      - name: Import check
+        run: |
+          python -c "import ast; ast.parse(open('icap_test.py').read()); print('✓ icap_test.py is valid')"
+          python -c "import ast; ast.parse(open('icap_server.py').read()); print('✓ icap_server.py is valid')"
+
+  file-changes:
+    name: Changed Files Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        run: |
+          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} > /tmp/changed_files.txt
+          echo "Changed files:"
+          cat /tmp/changed_files.txt
+
+      - name: Check for breaking changes
+        run: |
+          if grep -q "VERSION" /tmp/changed_files.txt; then
+            echo "✓ VERSION file was updated"
+          fi
+          if grep -q "CHANGELOG" /tmp/changed_files.txt; then
+            echo "✓ CHANGELOG was updated"
+          fi
