@@ -1,9 +1,10 @@
 # ICAP Security Testing Suite
 
-[![Version](https://img.shields.io/badge/version-1.1.7-blue.svg)](VERSION)
+[![Version](https://img.shields.io/badge/version-1.1.8-blue.svg)](VERSION)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](docker-compose.yml)
+[![Security](https://img.shields.io/badge/security-audit-success.svg)](SECURITY_SCAN.md)
 
 **Languages:** 🇬🇧 [English](README.md) | 🇩🇪 [Deutsch](README.de.md)
 
@@ -39,6 +40,18 @@ This project provides a **complete test and development environment** for the IC
 - 🎓 Learners who want to understand ICAP
 - 🧑‍🔬 QA engineers for automated testing
 - 🔐 Security teams for antivirus validation
+
+## 🔐 Security
+
+This project is **security-audited and vetted**. See [SECURITY_SCAN.md](SECURITY_SCAN.md) for:
+- ✅ Complete vulnerability assessment
+- ✅ Bandit security scan results (0 vulnerabilities)
+- ✅ Production readiness checklist
+- ⚠️ Important TLS/SSL recommendations
+
+**Quick verdict:** Safe for lab/test environments • Requires TLS for production networks
+
+---
 
 ## 🎯 Features
 
@@ -447,4 +460,4 @@ See [LICENSE](LICENSE) file for details.
 Created for ICAP functionality testing and virus scanner validation with a focus on simplicity and maintainability.
 
 **Author:** Roland Imme  
-**Version:** 1.1.7
+**Version:** 1.1.8

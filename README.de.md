@@ -1,9 +1,10 @@
 # ICAP Security Testing Suite
 
-[![Version](https://img.shields.io/badge/version-1.1.7-blue.svg)](VERSION)
+[![Version](https://img.shields.io/badge/version-1.1.8-blue.svg)](VERSION)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](docker-compose.yml)
+[![Security](https://img.shields.io/badge/security-audit-success.svg)](SECURITY_SCAN.md)
 
 **Sprachen:** 🇬🇧 [English](README.md) | 🇩🇪 [Deutsch](README.de.md)
 
@@ -39,6 +40,18 @@ Dieses Projekt stellt eine **vollständige Test- und Entwicklungsumgebung** für
 - 🎓 Lernende, die ICAP verstehen wollen
 - 🧑‍🔬 QA-Engineers für automatisierte Tests
 - 🔐 Security-Teams für Antivirus-Validierung
+
+## 🔐 Sicherheit
+
+Dieses Projekt ist **sicherheitsgeprüft und zertifiziert**. Siehe [SECURITY_SCAN.md](SECURITY_SCAN.md) für:
+- ✅ Komplette Vulnerability-Prüfung
+- ✅ Bandit Security-Scan-Ergebnisse (0 Schwachstellen)
+- ✅ Produktionsreife-Checkliste
+- ⚠️ Wichtige TLS/SSL-Empfehlungen
+
+**Kurz-Urteil:** Sicher für Lab/Test-Umgebungen • Braucht TLS für produktive Netze
+
+---
 
 ## 🎯 Features
 
@@ -447,4 +460,4 @@ Siehe [LICENSE](LICENSE) Datei für Details.
 Erstellt für ICAP-Funktionstests und Virenscanner-Validierung mit Fokus auf Einfachheit und Wartbarkeit.
 
 **Autor:** Roland Imme  
-**Version:** 1.1.7
+**Version:** 1.1.8
